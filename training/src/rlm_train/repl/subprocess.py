@@ -47,7 +47,10 @@ class SubprocessReplBackend(ReplBackend):
         env.setdefault("PYTHONUNBUFFERED", "1")
 
         self._proc = await asyncio.create_subprocess_exec(
-            self._python, "-u", "-m", self._worker_module,
+            self._python,
+            "-u",
+            "-m",
+            self._worker_module,
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,

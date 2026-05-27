@@ -17,38 +17,105 @@ from contextlib import contextmanager
 from typing import Any
 
 _SAFE_BUILTINS = {
-    "print": print, "len": len, "str": str, "int": int, "float": float,
-    "list": list, "dict": dict, "set": set, "tuple": tuple, "bool": bool,
-    "type": type, "isinstance": isinstance, "issubclass": issubclass,
-    "enumerate": enumerate, "zip": zip, "map": map, "filter": filter,
-    "sorted": sorted, "reversed": reversed, "range": range,
-    "min": min, "max": max, "sum": sum, "abs": abs, "round": round,
-    "any": any, "all": all, "pow": pow, "divmod": divmod,
-    "chr": chr, "ord": ord, "hex": hex, "bin": bin, "oct": oct,
-    "repr": repr, "ascii": ascii, "format": format, "hash": hash, "id": id,
-    "iter": iter, "next": next, "slice": slice, "callable": callable,
-    "hasattr": hasattr, "getattr": getattr, "setattr": setattr, "delattr": delattr,
-    "dir": dir, "vars": vars,
-    "bytes": bytes, "bytearray": bytearray, "memoryview": memoryview,
-    "complex": complex, "object": object, "super": super, "property": property,
-    "staticmethod": staticmethod, "classmethod": classmethod,
-    "__import__": __import__, "open": open,
-    "Exception": Exception, "BaseException": BaseException,
-    "ValueError": ValueError, "TypeError": TypeError, "KeyError": KeyError,
-    "IndexError": IndexError, "AttributeError": AttributeError,
-    "FileNotFoundError": FileNotFoundError, "OSError": OSError, "IOError": IOError,
-    "RuntimeError": RuntimeError, "NameError": NameError, "ImportError": ImportError,
-    "StopIteration": StopIteration, "AssertionError": AssertionError,
-    "NotImplementedError": NotImplementedError, "ArithmeticError": ArithmeticError,
-    "LookupError": LookupError, "Warning": Warning,
-    "input": None, "eval": None, "exec": None, "compile": None,
-    "globals": None, "locals": None,
+    "print": print,
+    "len": len,
+    "str": str,
+    "int": int,
+    "float": float,
+    "list": list,
+    "dict": dict,
+    "set": set,
+    "tuple": tuple,
+    "bool": bool,
+    "type": type,
+    "isinstance": isinstance,
+    "issubclass": issubclass,
+    "enumerate": enumerate,
+    "zip": zip,
+    "map": map,
+    "filter": filter,
+    "sorted": sorted,
+    "reversed": reversed,
+    "range": range,
+    "min": min,
+    "max": max,
+    "sum": sum,
+    "abs": abs,
+    "round": round,
+    "any": any,
+    "all": all,
+    "pow": pow,
+    "divmod": divmod,
+    "chr": chr,
+    "ord": ord,
+    "hex": hex,
+    "bin": bin,
+    "oct": oct,
+    "repr": repr,
+    "ascii": ascii,
+    "format": format,
+    "hash": hash,
+    "id": id,
+    "iter": iter,
+    "next": next,
+    "slice": slice,
+    "callable": callable,
+    "hasattr": hasattr,
+    "getattr": getattr,
+    "setattr": setattr,
+    "delattr": delattr,
+    "dir": dir,
+    "vars": vars,
+    "bytes": bytes,
+    "bytearray": bytearray,
+    "memoryview": memoryview,
+    "complex": complex,
+    "object": object,
+    "super": super,
+    "property": property,
+    "staticmethod": staticmethod,
+    "classmethod": classmethod,
+    "__import__": __import__,
+    "open": open,
+    "Exception": Exception,
+    "BaseException": BaseException,
+    "ValueError": ValueError,
+    "TypeError": TypeError,
+    "KeyError": KeyError,
+    "IndexError": IndexError,
+    "AttributeError": AttributeError,
+    "FileNotFoundError": FileNotFoundError,
+    "OSError": OSError,
+    "IOError": IOError,
+    "RuntimeError": RuntimeError,
+    "NameError": NameError,
+    "ImportError": ImportError,
+    "StopIteration": StopIteration,
+    "AssertionError": AssertionError,
+    "NotImplementedError": NotImplementedError,
+    "ArithmeticError": ArithmeticError,
+    "LookupError": LookupError,
+    "Warning": Warning,
+    "input": None,
+    "eval": None,
+    "exec": None,
+    "compile": None,
+    "globals": None,
+    "locals": None,
 }
 
-RESERVED_TOOL_NAMES = frozenset({
-    "llm_query", "llm_query_batched", "rlm_query", "rlm_query_batched",
-    "SHOW_VARS", "answer", "context", "history",
-})
+RESERVED_TOOL_NAMES = frozenset(
+    {
+        "llm_query",
+        "llm_query_batched",
+        "rlm_query",
+        "rlm_query_batched",
+        "SHOW_VARS",
+        "answer",
+        "context",
+        "history",
+    }
+)
 
 
 class _AnswerDict(dict):
@@ -143,7 +210,10 @@ class Worker:
         url = f"{self.proxy_url}/rollout/{self.rollout_id}/{path.lstrip('/')}"
         body = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
-            url, data=body, headers={"Content-Type": "application/json"}, method="POST",
+            url,
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
         )
         try:
             with urllib.request.urlopen(req, timeout=600) as resp:
@@ -153,7 +223,11 @@ class Worker:
                 detail = e.read().decode("utf-8")
             except Exception:
                 detail = ""
-            too_large = e.code == 413 or "Entity Too Large" in (detail or "") or "Entity Too Large" in (e.reason or "")
+            too_large = (
+                e.code == 413
+                or "Entity Too Large" in (detail or "")
+                or "Entity Too Large" in (e.reason or "")
+            )
             return {"error": f"HTTP {e.code}: {detail or e.reason}", "too_large": too_large}
         except Exception as e:
             return {"error": f"Proxy request failed: {e}"}
@@ -253,7 +327,8 @@ class Worker:
         final_answer = self._last_final_answer
         self._last_final_answer = None
         simple_keys = [
-            k for k, v in self.locals.items()
+            k
+            for k, v in self.locals.items()
             if not k.startswith("_")
             and k not in ("__builtins__", "__name__", "__doc__")
             and isinstance(v, (str, int, float, bool, list, dict, tuple))
@@ -305,7 +380,9 @@ def main() -> None:
                 result = worker.execute(req.get("code", ""))
                 _send({"id": rid, "ok": True, **result})
             except BaseException as e:  # noqa: BLE001
-                _send({"id": rid, "ok": False, "error": f"exec failed: {e}\n{traceback.format_exc()}"})
+                _send(
+                    {"id": rid, "ok": False, "error": f"exec failed: {e}\n{traceback.format_exc()}"}
+                )
         elif kind == "load_context":
             try:
                 idx = worker.load_context(req.get("payload"), req.get("index"))
@@ -319,7 +396,13 @@ def main() -> None:
                     exec(compile(code, "<bootstrap>", "exec"), worker.globals)
                 _send({"id": rid, "ok": True})
             except BaseException as e:  # noqa: BLE001
-                _send({"id": rid, "ok": False, "error": f"bootstrap failed: {e}\n{traceback.format_exc()}"})
+                _send(
+                    {
+                        "id": rid,
+                        "ok": False,
+                        "error": f"bootstrap failed: {e}\n{traceback.format_exc()}",
+                    }
+                )
         elif kind == "shutdown":
             _send({"id": rid, "ok": True})
             return

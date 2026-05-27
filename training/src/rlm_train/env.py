@@ -180,10 +180,15 @@ class RLMTrainEnv(vf.MultiTurnEnv):
                 try:
                     result = await backend.execute(code)
                 except Exception as e:  # noqa: BLE001
-                    outputs.append({
-                        "code": code, "stdout": "", "stderr": f"Worker error: {e}",
-                        "final_answer": None, "locals_keys": [],
-                    })
+                    outputs.append(
+                        {
+                            "code": code,
+                            "stdout": "",
+                            "stderr": f"Worker error: {e}",
+                            "final_answer": None,
+                            "locals_keys": [],
+                        }
+                    )
                     continue
                 outputs.append(_pack_exec(code, result))
                 state["rlm_repl_calls"] = int(state.get("rlm_repl_calls") or 0) + 1
@@ -250,7 +255,8 @@ def _normalize_for_api(msgs: list) -> list:
             out.append(m)
             continue
         reasoning = (
-            m.get("reasoning_content") if isinstance(m, dict)
+            m.get("reasoning_content")
+            if isinstance(m, dict)
             else getattr(m, "reasoning_content", None)
         )
         if isinstance(m, dict):
@@ -323,5 +329,7 @@ def _format_one(o: dict[str, Any]) -> str:
         parts.append(f"REPL variables: {list(o['locals_keys'])}\n")
     body = "\n\n".join(parts) if parts else "No output"
     if len(body) > _MAX_REPL_OUTPUT_CHARS:
-        body = body[:_MAX_REPL_OUTPUT_CHARS] + f"... + [{len(body) - _MAX_REPL_OUTPUT_CHARS} chars...]"
+        body = (
+            body[:_MAX_REPL_OUTPUT_CHARS] + f"... + [{len(body) - _MAX_REPL_OUTPUT_CHARS} chars...]"
+        )
     return body

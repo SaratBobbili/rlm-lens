@@ -56,9 +56,7 @@ class RLMTrainRubric(vf.Rubric):
             result = await result
         return float(result)
 
-    def _make_main_correctness(
-        self, correctness: Callable[..., float]
-    ) -> Callable[..., Any]:
+    def _make_main_correctness(self, correctness: Callable[..., float]) -> Callable[..., Any]:
         gated_mode = self._gate_reward
         min_rew = self._min_reward
 
@@ -76,9 +74,7 @@ class RLMTrainRubric(vf.Rubric):
         main.__name__ = getattr(correctness, "__name__", "correctness")
         return main
 
-    def _make_gated_metric(
-        self, correctness: Callable[..., float]
-    ) -> Callable[..., Any]:
+    def _make_gated_metric(self, correctness: Callable[..., float]) -> Callable[..., Any]:
         min_rew = self._min_reward
 
         async def gated_reward(**kwargs: Any) -> float:

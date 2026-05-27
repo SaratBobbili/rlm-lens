@@ -196,7 +196,9 @@ class SubLLMProxy:
                     text, meta = await self._completion(handle, p, model)
                     if handle.record_call is not None:
                         try:
-                            handle.record_call({"model": model, "prompt": p, "response": text, **meta})
+                            handle.record_call(
+                                {"model": model, "prompt": p, "response": text, **meta}
+                            )
                         except Exception:
                             logger.exception("record_call failed")
                     return text
@@ -208,7 +210,10 @@ class SubLLMProxy:
         return web.json_response({"responses": results})
 
     async def _completion(
-        self, handle: ClientHandle, prompt: str | list, model: str,
+        self,
+        handle: ClientHandle,
+        prompt: str | list,
+        model: str,
     ) -> tuple[str, dict[str, Any]]:
         if handle.fake_query is not None:
             prompt_text = _flatten_prompt(prompt)

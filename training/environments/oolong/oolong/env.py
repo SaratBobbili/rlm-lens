@@ -135,12 +135,14 @@ def _build_dataset(
             "context": context,
             "root_prompt": f"{_QUESTION_INSTRUCTION}\n\nQuestion: {question}",
         }
-        rows.append({
-            "example_id": i,
-            "prompt": [{"role": "user", "content": question}],
-            "answer": str(s.get("answer", "")),
-            "info": json.dumps(meta),
-        })
+        rows.append(
+            {
+                "example_id": i,
+                "prompt": [{"role": "user", "content": question}],
+                "answer": str(s.get("answer", "")),
+                "info": json.dumps(meta),
+            }
+        )
     return Dataset.from_list(rows)
 
 

@@ -153,7 +153,7 @@ ORCHESTRATOR_ADDENDUM = "\n\n".join(
             "the concrete sequence of turns — what each turn computes and which sub-LLM call "
             "(if any) it issues — like a condensed trajectory, before you execute them. "
             "Then execute one turn at a time: after each step `print` a small sample of the "
-            "result, verify it looks right, and only flip `answer[\"ready\"] = True` once you "
+            'result, verify it looks right, and only flip `answer["ready"] = True` once you '
             "have actually printed the candidate answer. If you are running out of turns "
             "without a confirmed answer, submit your best inference rather than letting the "
             "rollout terminate unsubmitted."
